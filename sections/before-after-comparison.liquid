@@ -1,0 +1,1017 @@
+{% liquid
+  assign section_id = 'section-' | append: section.id
+  assign section_class = 'section section--' | append: section.settings.section_height
+  if section.settings.color_scheme != 'default'
+    assign section_class = section_class | append: ' color-' | append: section.settings.color_scheme
+  endif
+  if section.settings.section_width == 'page-width'
+    assign section_class = section_class | append: ' section--page-width'
+  endif
+  if section.settings.section_width == 'full-width'
+    assign section_class = section_class | append: ' section--full-width'
+  endif
+  if section.settings.section_width == 'full-width-margin'
+    assign section_class = section_class | append: ' section--full-width section--full-width-margin'
+  endif
+  if section.settings.padding_block_start > 0
+    assign section_class = section_class | append: ' section--padding-block-start'
+  endif
+  if section.settings.padding_block_end > 0
+    assign section_class = section_class | append: ' section--padding-block-end'
+  endif
+%}
+
+<div class="{{ section_class }}" id="{{ section_id }}">
+  <div class="section-content-wrapper">
+    <!-- Heading Section -->
+    {% if section.settings.heading != blank or section.settings.subheading != blank %}
+      <div class="before-after-comparison__header">
+        {% if section.settings.heading != blank %}
+          <h2 class="before-after-comparison__heading" style="font-size: {{ section.settings.heading_font_size }}px; background: {{ section.settings.heading_gradient }}; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+            {{ section.settings.heading }}
+          </h2>
+        {% endif %}
+        {% if section.settings.subheading != blank %}
+          <p class="before-after-comparison__subheading" style="font-size: {{ section.settings.subheading_font_size }}px; background: {{ section.settings.subheading_gradient }}; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+            {{ section.settings.subheading }}
+          </p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="before-after-comparison" data-before-after-comparison>
+      <div class="before-after-comparison__container before-after-comparison__container--{{ section.settings.image_aspect_ratio }}">
+        <!-- Left Section (Before) -->
+        <div class="before-after-comparison__side before-after-comparison__side--left">
+          <div class="before-after-comparison__media-container">
+            {% if section.settings.media_type_1 == 'video' %}
+              {% if section.settings.shopify_video_1 != blank %}
+                <video 
+                  class="before-after-comparison__video"
+                  {% if section.settings.autoplay_1 %}autoplay{% endif %}
+                  {% if section.settings.loop_1 %}loop{% endif %}
+                  {% if section.settings.muted_1 %}muted{% endif %}
+                  {% if section.settings.controls_1 %}controls{% endif %}
+                  playsinline
+                  preload="metadata"
+                >
+                  <source src="{{ section.settings.shopify_video_1 }}" type="video/mp4">
+                  Your browser does not support the video tag.
+                </video>
+              {% elsif section.settings.video_1 != blank %}
+                <video 
+                  class="before-after-comparison__video"
+                  {% if section.settings.autoplay_1 %}autoplay{% endif %}
+                  {% if section.settings.loop_1 %}loop{% endif %}
+                  {% if section.settings.muted_1 %}muted{% endif %}
+                  {% if section.settings.controls_1 %}controls{% endif %}
+                  playsinline
+                  preload="metadata"
+                >
+                  <source src="{{ section.settings.video_1 }}" type="video/mp4">
+                  Your browser does not support the video tag.
+                </video>
+              {% endif %}
+            {% elsif section.settings.image_1 != blank %}
+              {{
+                section.settings.image_1
+                | image_url: width: 1200
+                | image_tag:
+                  class: 'before-after-comparison__image',
+                  loading: 'lazy',
+                  alt: section.settings.image_1.alt | default: section.settings.text_1
+              }}
+            {% endif %}
+          </div>
+          
+          <div class="before-after-comparison__content before-after-comparison__content--left">
+            {% if section.settings.text_1 != blank %}
+              <div class="before-after-comparison__text">
+                {{ section.settings.text_1 }}
+              </div>
+            {% endif %}
+            
+            {% if section.settings.button_1_label != blank and section.settings.button_1_link != blank %}
+              <a href="{{ section.settings.button_1_link }}" class="button button--primary before-after-comparison__button">
+                {{ section.settings.button_1_label }}
+              </a>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Center Divider -->
+        <div class="before-after-comparison__divider" data-divider>
+          <div class="before-after-comparison__divider-line"></div>
+          <button class="before-after-comparison__toggle" aria-label="Drag to compare before and after">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 5L3 12L8 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M16 5L21 12L16 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 3L12 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Right Section (After) -->
+        <div class="before-after-comparison__side before-after-comparison__side--right">
+          <div class="before-after-comparison__media-container">
+            {% if section.settings.media_type_2 == 'video' %}
+              {% if section.settings.shopify_video_2 != blank %}
+                <video 
+                  class="before-after-comparison__video"
+                  {% if section.settings.autoplay_2 %}autoplay{% endif %}
+                  {% if section.settings.loop_2 %}loop{% endif %}
+                  {% if section.settings.muted_2 %}muted{% endif %}
+                  {% if section.settings.controls_2 %}controls{% endif %}
+                  playsinline
+                  preload="metadata"
+                >
+                  <source src="{{ section.settings.shopify_video_2 }}" type="video/mp4">
+                  Your browser does not support the video tag.
+                </video>
+              {% elsif section.settings.video_2 != blank %}
+                <video 
+                  class="before-after-comparison__video"
+                  {% if section.settings.autoplay_2 %}autoplay{% endif %}
+                  {% if section.settings.loop_2 %}loop{% endif %}
+                  {% if section.settings.muted_2 %}muted{% endif %}
+                  {% if section.settings.controls_2 %}controls{% endif %}
+                  playsinline
+                  preload="metadata"
+                >
+                  <source src="{{ section.settings.video_2 }}" type="video/mp4">
+                  Your browser does not support the video tag.
+                </video>
+              {% endif %}
+            {% elsif section.settings.image_2 != blank %}
+              {{
+                section.settings.image_2
+                | image_url: width: 1200
+                | image_tag:
+                  class: 'before-after-comparison__image',
+                  loading: 'lazy',
+                  alt: section.settings.image_2.alt | default: section.settings.text_2
+              }}
+            {% endif %}
+          </div>
+          
+          <div class="before-after-comparison__content before-after-comparison__content--right">
+            {% if section.settings.text_2 != blank %}
+              <div class="before-after-comparison__text">
+                {{ section.settings.text_2 }}
+              </div>
+            {% endif %}
+            
+            {% if section.settings.button_2_label != blank and section.settings.button_2_link != blank %}
+              <a href="{{ section.settings.button_2_link }}" class="button button--primary before-after-comparison__button">
+                {{ section.settings.button_2_label }}
+                {% if section.settings.button_2_icon %}
+                  <svg class="button__icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 1L15 8L8 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                {% endif %}
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .before-after-comparison__header {
+    text-align: center;
+    margin-bottom: 40px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .before-after-comparison__heading {
+    margin: 0 0 16px 0;
+    font-weight: bold;
+    line-height: 1.2;
+  }
+
+  .before-after-comparison__subheading {
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .before-after-comparison {
+    width: 100%;
+    overflow: hidden;
+    max-width: 1000px !important;
+    margin: 0 auto;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  .before-after-comparison__container {
+    display: flex;
+    position: relative;
+    min-height: 400px;
+    border-radius: 15px;
+    overflow: hidden;
+  }
+
+  .before-after-comparison__container--full {
+    aspect-ratio: auto;
+  }
+
+  .before-after-comparison__container--square {
+    aspect-ratio: 1 / 1;
+  }
+
+  .before-after-comparison__container--portrait {
+    aspect-ratio: 3 / 4;
+  }
+
+  .before-after-comparison__container--landscape {
+    aspect-ratio: 16 / 9;
+  }
+
+  .before-after-comparison__side {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .before-after-comparison__side--right {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+  }
+
+  .before-after-comparison__media-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .before-after-comparison__image,
+  .before-after-comparison__video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .before-after-comparison__video {
+    background-color: #000;
+  }
+
+  .before-after-comparison__content {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    z-index: 2;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+
+  .before-after-comparison__content--left {
+    opacity: 1;
+  }
+
+  .before-after-comparison__content--right {
+    opacity: 0;
+    left: 50%;
+  }
+
+  .before-after-comparison__text {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  .before-after-comparison__button {
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+  }
+
+  .before-after-comparison__button:hover {
+    background-color: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .before-after-comparison__divider {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: ew-resize;
+  }
+
+  .before-after-comparison__divider-line {
+    position: absolute;
+    width: 2px;
+    height: 100vh;
+    background-color: black;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .before-after-comparison__toggle {
+    background-color: white;
+    color: black;
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 4;
+  }
+
+  .before-after-comparison__toggle:hover {
+    background-color: #f5f5f5;
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  }
+
+  .before-after-comparison__toggle svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .button__icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Mobile Responsive Styles */
+  @media screen and (max-width: 749px) {
+    .before-after-comparison__header {
+      margin-bottom: 30px;
+      padding: 0 15px;
+    }
+
+    .before-after-comparison {
+      max-width: 100% !important;
+      margin: 0 15px;
+      border-radius: 12px;
+    }
+
+    .before-after-comparison__container {
+      min-height: 400px;
+      border-radius: 12px;
+    }
+
+    .before-after-comparison__content {
+      bottom: 15px;
+      left: 15px;
+      right: 15px;
+    }
+
+    .before-after-comparison__text {
+      font-size: 1.2rem;
+    }
+
+    .before-after-comparison__toggle {
+      width: 44px;
+      height: 44px;
+    }
+
+    .before-after-comparison__toggle svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  /* Small Mobile Devices */
+  @media screen and (max-width: 480px) {
+    .before-after-comparison__header {
+      margin-bottom: 25px;
+      padding: 0 10px;
+    }
+
+    .before-after-comparison {
+      margin: 0 10px;
+      border-radius: 10px;
+    }
+
+    .before-after-comparison__container {
+      min-height: 350px;
+      border-radius: 10px;
+    }
+
+    .before-after-comparison__content {
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+    }
+
+    .before-after-comparison__text {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    .before-after-comparison__button {
+      padding: 10px 20px;
+      font-size: 0.85rem;
+    }
+
+    .before-after-comparison__toggle {
+      width: 40px;
+      height: 40px;
+    }
+
+    .before-after-comparison__toggle svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+</style>
+
+<script>
+  class BeforeAfterComparison {
+    constructor(element) {
+      this.element = element;
+      this.container = element.querySelector('.before-after-comparison__container');
+      this.divider = element.querySelector('[data-divider]');
+      this.rightSide = element.querySelector('.before-after-comparison__side--right');
+      this.leftContent = element.querySelector('.before-after-comparison__content--left');
+      this.rightContent = element.querySelector('.before-after-comparison__content--right');
+      this.leftVideo = element.querySelector('.before-after-comparison__side--left video');
+      this.rightVideo = element.querySelector('.before-after-comparison__side--right video');
+      this.isDragging = false;
+      this.startX = 0;
+      this.startY = 0;
+      
+      this.init();
+    }
+
+    init() {
+      this.divider.addEventListener('mousedown', this.startDrag.bind(this));
+      this.divider.addEventListener('touchstart', this.startDrag.bind(this));
+      document.addEventListener('mousemove', this.drag.bind(this));
+      document.addEventListener('touchmove', this.drag.bind(this));
+      document.addEventListener('mouseup', this.stopDrag.bind(this));
+      document.addEventListener('touchend', this.stopDrag.bind(this));
+      
+      // Set initial position
+      this.updatePosition(50);
+      
+      // Handle video interactions
+      this.handleVideoInteractions();
+    }
+
+    handleVideoInteractions() {
+      // Pause videos when dragging starts
+      this.divider.addEventListener('mousedown', () => {
+        if (this.leftVideo) this.leftVideo.pause();
+        if (this.rightVideo) this.rightVideo.pause();
+      });
+      
+      this.divider.addEventListener('touchstart', () => {
+        if (this.leftVideo) this.leftVideo.pause();
+        if (this.rightVideo) this.rightVideo.pause();
+      });
+    }
+
+    startDrag(e) {
+      e.preventDefault();
+      this.isDragging = true;
+      
+      if (e.type === 'mousedown') {
+        this.startX = e.clientX;
+        this.startY = e.clientY;
+      } else if (e.type === 'touchstart') {
+        this.startX = e.touches[0].clientX;
+        this.startY = e.touches[0].clientY;
+      }
+      
+      this.divider.style.transition = 'none';
+    }
+
+    drag(e) {
+      if (!this.isDragging) return;
+      
+      e.preventDefault();
+      
+      let currentX, currentY;
+      
+      if (e.type === 'mousemove') {
+        currentX = e.clientX;
+        currentY = e.clientY;
+      } else if (e.type === 'touchmove') {
+        currentX = e.touches[0].clientX;
+        currentY = e.touches[0].clientY;
+      }
+      
+      const rect = this.container.getBoundingClientRect();
+      
+      // Always horizontal drag (left to right)
+      const percentage = ((currentX - rect.left) / rect.width) * 100;
+      this.updatePosition(Math.max(0, Math.min(100, percentage)));
+    }
+
+    stopDrag() {
+      this.isDragging = false;
+      this.divider.style.transition = '';
+    }
+
+    updatePosition(percentage) {
+      // Horizontal clip-path for both desktop and mobile
+      this.rightSide.style.clipPath = `polygon(${percentage}% 0, 100% 0, 100% 100%, ${percentage}% 100%)`;
+      this.divider.style.left = `${percentage}%`;
+      this.divider.style.top = '50%';
+      this.divider.style.transform = 'translate(-50%, -50%)';
+      
+      // Update content visibility
+      if (percentage < 30) {
+        this.leftContent.style.opacity = '1';
+        this.rightContent.style.opacity = '0';
+      } else if (percentage > 70) {
+        this.leftContent.style.opacity = '0';
+        this.rightContent.style.opacity = '1';
+      } else {
+        this.leftContent.style.opacity = '0.3';
+        this.rightContent.style.opacity = '0.3';
+      }
+    }
+  }
+
+  // Initialize all before/after comparisons on the page
+  document.addEventListener('DOMContentLoaded', function() {
+    const comparisons = document.querySelectorAll('[data-before-after-comparison]');
+    comparisons.forEach(comparison => new BeforeAfterComparison(comparison));
+  });
+
+  // Handle window resize
+  window.addEventListener('resize', function() {
+    const comparisons = document.querySelectorAll('[data-before-after-comparison]');
+    comparisons.forEach(comparison => {
+      if (comparison.beforeAfterInstance) {
+        comparison.beforeAfterInstance.updatePosition(50);
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Before/After Comparison",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Before & After Comparison"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Heading font size",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "select",
+      "id": "heading_gradient",
+      "label": "Heading gradient",
+      "options": [
+        {
+          "value": "linear-gradient(45deg, #667eea 0%, #764ba2 100%)",
+          "label": "Purple to Blue"
+        },
+        {
+          "value": "linear-gradient(45deg, #f093fb 0%, #f5576c 100%)",
+          "label": "Pink to Red"
+        },
+        {
+          "value": "linear-gradient(45deg, #4facfe 0%, #00f2fe 100%)",
+          "label": "Blue to Cyan"
+        },
+        {
+          "value": "linear-gradient(45deg, #43e97b 0%, #38f9d7 100%)",
+          "label": "Green to Teal"
+        },
+        {
+          "value": "linear-gradient(45deg, #fa709a 0%, #fee140 100%)",
+          "label": "Pink to Yellow"
+        },
+        {
+          "value": "linear-gradient(45deg, #a8edea 0%, #fed6e3 100%)",
+          "label": "Mint to Pink"
+        },
+        {
+          "value": "linear-gradient(45deg, #ff9a9e 0%, #fecfef 100%)",
+          "label": "Coral to Pink"
+        },
+        {
+          "value": "linear-gradient(45deg, #ffecd2 0%, #fcb69f 100%)",
+          "label": "Peach to Orange"
+        },
+        {
+          "value": "linear-gradient(45deg, #a18cd1 0%, #fbc2eb 100%)",
+          "label": "Lavender to Pink"
+        },
+        {
+          "value": "linear-gradient(45deg, #fad0c4 0%, #ffd1ff 100%)",
+          "label": "Peach to Purple"
+        },
+        {
+          "value": "var(--color-foreground)",
+          "label": "Default Color"
+        }
+      ],
+      "default": "linear-gradient(45deg, #667eea 0%, #764ba2 100%)"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Drag the slider to see the transformation"
+    },
+    {
+      "type": "range",
+      "id": "subheading_font_size",
+      "label": "Subheading font size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "subheading_gradient",
+      "label": "Subheading gradient",
+      "options": [
+        {
+          "value": "linear-gradient(45deg, #667eea 0%, #764ba2 100%)",
+          "label": "Purple to Blue"
+        },
+        {
+          "value": "linear-gradient(45deg, #f093fb 0%, #f5576c 100%)",
+          "label": "Pink to Red"
+        },
+        {
+          "value": "linear-gradient(45deg, #4facfe 0%, #00f2fe 100%)",
+          "label": "Blue to Cyan"
+        },
+        {
+          "value": "linear-gradient(45deg, #43e97b 0%, #38f9d7 100%)",
+          "label": "Green to Teal"
+        },
+        {
+          "value": "linear-gradient(45deg, #fa709a 0%, #fee140 100%)",
+          "label": "Pink to Yellow"
+        },
+        {
+          "value": "linear-gradient(45deg, #a8edea 0%, #fed6e3 100%)",
+          "label": "Mint to Pink"
+        },
+        {
+          "value": "linear-gradient(45deg, #ff9a9e 0%, #fecfef 100%)",
+          "label": "Coral to Pink"
+        },
+        {
+          "value": "linear-gradient(45deg, #ffecd2 0%, #fcb69f 100%)",
+          "label": "Peach to Orange"
+        },
+        {
+          "value": "linear-gradient(45deg, #a18cd1 0%, #fbc2eb 100%)",
+          "label": "Lavender to Pink"
+        },
+        {
+          "value": "linear-gradient(45deg, #fad0c4 0%, #ffd1ff 100%)",
+          "label": "Peach to Purple"
+        },
+        {
+          "value": "var(--color-foreground)",
+          "label": "Default Color"
+        }
+      ],
+      "default": "var(--color-foreground)"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "image_aspect_ratio",
+      "label": "Media aspect ratio",
+      "options": [
+        {
+          "value": "full",
+          "label": "Full media (auto)"
+        },
+        {
+          "value": "square",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "portrait",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "landscape",
+          "label": "Landscape (16:9)"
+        }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "select",
+      "id": "section_height",
+      "label": "Section height",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "Page width"
+        },
+        {
+          "value": "full-width",
+          "label": "Full width"
+        },
+        {
+          "value": "full-width-margin",
+          "label": "Full width with margin"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        {
+          "value": "default",
+          "label": "Default"
+        },
+        {
+          "value": "scheme-1",
+          "label": "Scheme 1"
+        },
+        {
+          "value": "scheme-2",
+          "label": "Scheme 2"
+        },
+        {
+          "value": "scheme-3",
+          "label": "Scheme 3"
+        },
+        {
+          "value": "scheme-4",
+          "label": "Scheme 4"
+        },
+        {
+          "value": "scheme-5",
+          "label": "Scheme 5"
+        }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "range",
+      "id": "padding_block_start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_block_end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Left Side (Before)"
+    },
+    {
+      "type": "select",
+      "id": "media_type_1",
+      "label": "Media type",
+      "options": [
+        {
+          "value": "image",
+          "label": "Image"
+        },
+        {
+          "value": "video",
+          "label": "Video"
+        }
+      ],
+      "default": "image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_1",
+      "label": "Image",
+      "info": "Used when media type is set to Image"
+    },
+    {
+      "type": "video",
+      "id": "shopify_video_1",
+      "label": "Shopify Video",
+      "info": "Upload video directly to Shopify. Used when media type is set to Video"
+    },
+    {
+      "type": "url",
+      "id": "video_1",
+      "label": "External Video URL",
+      "info": "External MP4 video URL. Used when media type is set to Video and no Shopify video is uploaded"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay_1",
+      "label": "Autoplay video",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "loop_1",
+      "label": "Loop video",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "muted_1",
+      "label": "Mute video",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "controls_1",
+      "label": "Show video controls",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "text_1",
+      "label": "Text",
+      "default": "BOYS"
+    },
+    {
+      "type": "text",
+      "id": "button_1_label",
+      "label": "Button label",
+      "default": "KIDS COLLECTION"
+    },
+    {
+      "type": "url",
+      "id": "button_1_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Right Side (After)"
+    },
+    {
+      "type": "select",
+      "id": "media_type_2",
+      "label": "Media type",
+      "options": [
+        {
+          "value": "image",
+          "label": "Image"
+        },
+        {
+          "value": "video",
+          "label": "Video"
+        }
+      ],
+      "default": "image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "Image",
+      "info": "Used when media type is set to Image"
+    },
+    {
+      "type": "video",
+      "id": "shopify_video_2",
+      "label": "Shopify Video",
+      "info": "Upload video directly to Shopify. Used when media type is set to Video"
+    },
+    {
+      "type": "url",
+      "id": "video_2",
+      "label": "External Video URL",
+      "info": "External MP4 video URL. Used when media type is set to Video and no Shopify video is uploaded"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay_2",
+      "label": "Autoplay video",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "loop_2",
+      "label": "Loop video",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "muted_2",
+      "label": "Mute video",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "controls_2",
+      "label": "Show video controls",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "text_2",
+      "label": "Text",
+      "default": "GIRLS"
+    },
+    {
+      "type": "text",
+      "id": "button_2_label",
+      "label": "Button label",
+      "default": "KIDS COLLECTION"
+    },
+    {
+      "type": "url",
+      "id": "button_2_link",
+      "label": "Button link"
+    },
+    {
+      "type": "checkbox",
+      "id": "button_2_icon",
+      "label": "Show icon on button",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Before/After Comparison",
+      "category": "Custom sections"
+    }
+  ]
+}
+{% endschema %} 
