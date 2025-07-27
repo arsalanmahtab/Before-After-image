@@ -46,6 +46,18 @@
     >
     <button
       type="button"
+      class="button-unstyled search__voice-button{{ color_scheme }}"
+      aria-label="{{ 'accessibility.voice_search' | t }}"
+      ref="voiceButton"
+      on:click="/startVoiceSearch"
+      title="{{ 'accessibility.voice_search' | t }}"
+    >
+      <span class="svg-wrapper search__voice-button-icon">
+        {{ 'icon-voice-search.svg' | inline_asset_content }}
+      </span>
+    </button>
+    <button
+      type="button"
       name="reset"
       class="button-unstyled search__reset-button{{ color_scheme }}"
       aria-label="{{ 'accessibility.reset_search' | t }}"
@@ -117,6 +129,8 @@
 
   search-page-input-component .search__icon,
   search-page-input-component .search__icon:hover,
+  search-page-input-component .search__voice-button,
+  search-page-input-component .search__voice-button:hover,
   search-page-input-component .search__reset-button,
   search-page-input-component .search__reset-button:hover {
     background: transparent;
@@ -127,6 +141,7 @@
   }
 
   search-page-input-component .search__icon svg,
+  search-page-input-component .search__voice-button svg,
   search-page-input-component .search__reset-button svg {
     width: var(--icon-size-md);
     height: var(--icon-size-md);
@@ -142,6 +157,32 @@
     @media screen and (max-width: 749px) {
       left: var(--margin-md);
     }
+  }
+
+  search-page-input-component .search__voice-button {
+    right: calc(var(--margin-lg) + var(--icon-size-lg) + var(--margin-sm));
+    cursor: pointer;
+    transition: opacity var(--animation-speed) var(--animation-easing),
+      visibility var(--animation-speed) var(--animation-easing);
+
+    @media screen and (max-width: 749px) {
+      right: calc(var(--margin-md) + var(--icon-size-lg) + var(--margin-sm));
+    }
+  }
+
+  search-page-input-component .search__voice-button:hover {
+    background: var(--color-background-secondary);
+    border-radius: 50%;
+  }
+
+  search-page-input-component .search__voice-button--listening {
+    background: var(--color-accent);
+    color: var(--color-background);
+    animation: pulse 1.5s infinite;
+  }
+
+  search-page-input-component .search__voice-button--listening:hover {
+    background: var(--color-accent);
   }
 
   search-page-input-component .search__reset-button {
@@ -195,6 +236,40 @@
 
   search-page-input-component .search__reset-button-text {
     display: none;
+  }
+
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(var(--color-accent-rgb), 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(var(--color-accent-rgb), 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(var(--color-accent-rgb), 0);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideOut {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
   }
 {% endstylesheet %}
 
