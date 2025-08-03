@@ -71,6 +71,7 @@
         <span class="svg-wrapper predictive-search__icon">
           {{ 'icon-search.svg' | inline_asset_content }}
         </span>
+        {% if settings.enable_voice_search %}
         <button
           type="button"
           class="button-unstyled predictive-search__voice-button"
@@ -83,6 +84,7 @@
             {{ 'icon-voice-search.svg' | inline_asset_content }}
           </span>
         </button>
+        {% endif %}
         <button
           type="button"
           class="button-unstyled predictive-search__reset-button"
@@ -161,6 +163,11 @@
     top: 50%;
     transform: translateY(-50%);
     z-index: 2;
+  }
+
+  /* Adjust reset button position when voice search is disabled */
+  .predictive-search-form__header-inner:not(:has(.predictive-search__voice-button)) .predictive-search__reset-button {
+    right: 8px;
   }
 
   .predictive-search__voice-button:hover {

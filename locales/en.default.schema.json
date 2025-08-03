@@ -684,6 +684,8 @@
     "effects": "Effects",
     "empty_state_collection": "Empty state collection",
     "empty_state_collection_info": "Shown before a search is entered",
+    "enable_voice_search": "Enable Voice Search",
+    "enable_voice_search_info": "Add voice search functionality to all search bars throughout the website",
     "enable_filtering": "Filters",
     "enable_grid_density": "Grid layout control",
     "enable_sorting": "Sorting",

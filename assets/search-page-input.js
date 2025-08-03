@@ -9,7 +9,7 @@ import { debounce } from '@theme/utilities';
  * @extends {Component<Refs>}
  */
 class SearchPageInputComponent extends Component {
-  requiredRefs = ['searchPageInput', 'voiceButton'];
+  requiredRefs = ['searchPageInput'];
 
   /**
    * Handles the click event on the clear button and submits an empty search.
@@ -62,21 +62,22 @@ class SearchPageInputComponent extends Component {
    * Initialize speech recognition
    */
   #initSpeechRecognition() {
+    // Check if voice button exists (voice search might be disabled)
+    if (!this.refs.voiceButton) {
+      return false;
+    }
+
     // Check if we're on HTTPS (required for speech recognition)
     if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
       this.#showVoiceSearchError('Voice search requires HTTPS. Please use a secure connection.');
-      if (this.refs.voiceButton) {
-        this.refs.voiceButton.style.display = 'none';
-      }
+      this.refs.voiceButton.style.display = 'none';
       return false;
     }
 
     // Check for speech recognition support
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
       this.#showVoiceSearchError('Voice search is not supported in this browser. Please use Chrome, Edge, or Safari.');
-      if (this.refs.voiceButton) {
-        this.refs.voiceButton.style.display = 'none';
-      }
+      this.refs.voiceButton.style.display = 'none';
       return false;
     }
 

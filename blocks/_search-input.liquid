@@ -44,6 +44,7 @@
       value="{{ search.terms | escape }}"
       placeholder="{{ 'content.search_input_placeholder' | t }}"
     >
+    {% if settings.enable_voice_search %}
     <button
       type="button"
       class="button-unstyled search__voice-button{{ color_scheme }}"
@@ -56,6 +57,7 @@
         {{ 'icon-voice-search.svg' | inline_asset_content }}
       </span>
     </button>
+    {% endif %}
     <button
       type="button"
       name="reset"
@@ -195,6 +197,15 @@
     pointer-events: none;
     transition: opacity var(--animation-speed) var(--animation-easing),
       visibility var(--animation-speed) var(--animation-easing);
+
+    @media screen and (max-width: 749px) {
+      right: var(--margin-md);
+    }
+  }
+
+  /* Adjust reset button position when voice search is disabled */
+  search-page-input-component:not(:has(.search__voice-button)) .search__reset-button {
+    right: var(--margin-lg);
 
     @media screen and (max-width: 749px) {
       right: var(--margin-md);

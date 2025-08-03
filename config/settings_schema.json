@@ -2149,6 +2149,13 @@
         "content": "t:names.predictive_search"
       },
       {
+        "type": "checkbox",
+        "id": "enable_voice_search",
+        "label": "t:settings.enable_voice_search",
+        "info": "t:settings.enable_voice_search_info",
+        "default": true
+      },
+      {
         "type": "range",
         "id": "product_corner_radius",
         "min": 0,
