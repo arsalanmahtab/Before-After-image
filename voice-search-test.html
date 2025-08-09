@@ -226,11 +226,67 @@
                 return;
             }
 
-            try {
-                recognition.start();
-            } catch (error) {
-                console.error('Error starting speech recognition:', error);
-                showStatus('Failed to start voice search. Please try again.', 'error');
+            // Play AI assistant voice prompt first
+            playVoicePrompt();
+        }
+
+        function playVoicePrompt() {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance();
+                
+                // Get custom prompt (you can change this for testing)
+                const customPrompt = "I am your AI assistant. How can I help you and what do you want to search?";
+                utterance.text = customPrompt;
+                utterance.lang = 'en-US';
+                utterance.rate = 0.9;
+                utterance.pitch = 1.0;
+                utterance.volume = 0.8;
+                
+                // Try to use a female voice (you can change this for testing)
+                const voices = speechSynthesis.getVoices();
+                const preferredVoice = voices.find(voice => {
+                    const isEnglish = voice.lang.includes('en');
+                    const isFemale = voice.name.toLowerCase().includes('female') || 
+                                   voice.name.toLowerCase().includes('woman') || 
+                                   voice.name.toLowerCase().includes('girl');
+                    return isEnglish && (isFemale || voice.name.includes('Google') || voice.name.includes('Natural'));
+                });
+                
+                if (preferredVoice) {
+                    utterance.voice = preferredVoice;
+                }
+                
+                utterance.onend = () => {
+                    // Start speech recognition after the prompt finishes
+                    setTimeout(() => {
+                        try {
+                            recognition.start();
+                        } catch (error) {
+                            console.error('Error starting speech recognition:', error);
+                            showStatus('Failed to start voice search. Please try again.', 'error');
+                        }
+                    }, 500);
+                };
+                
+                utterance.onerror = () => {
+                    // If voice prompt fails, start recognition anyway
+                    try {
+                        recognition.start();
+                    } catch (error) {
+                        console.error('Error starting speech recognition:', error);
+                        showStatus('Failed to start voice search. Please try again.', 'error');
+                    }
+                };
+                
+                speechSynthesis.speak(utterance);
+            } else {
+                // Fallback if speech synthesis is not supported
+                try {
+                    recognition.start();
+                } catch (error) {
+                    console.error('Error starting speech recognition:', error);
+                    showStatus('Failed to start voice search. Please try again.', 'error');
+                }
             }
         }
 

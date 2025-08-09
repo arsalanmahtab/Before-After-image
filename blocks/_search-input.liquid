@@ -18,6 +18,8 @@
 >
   <search-page-input-component
     style="{% render 'size-style', settings: block.settings %}{% render 'spacing-style', settings: block.settings %}"
+    data-voice-prompt="{{ settings.voice_search_prompt | escape }}"
+    data-voice-gender="{{ settings.voice_search_gender | default: 'female' }}"
     {{ block.shopify_attributes }}
   >
     <label

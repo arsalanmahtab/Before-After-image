@@ -2156,6 +2156,34 @@
         "default": true
       },
       {
+        "type": "text",
+        "id": "voice_search_prompt",
+        "label": "t:settings.voice_search_prompt",
+        "info": "t:settings.voice_search_prompt_info",
+        "default": "I am your AI assistant. How can I help you and what do you want to search?"
+      },
+      {
+        "type": "select",
+        "id": "voice_search_gender",
+        "label": "t:settings.voice_search_gender",
+        "info": "t:settings.voice_search_gender_info",
+        "options": [
+          {
+            "value": "female",
+            "label": "t:settings.voice_search_gender_female"
+          },
+          {
+            "value": "male",
+            "label": "t:settings.voice_search_gender_male"
+          },
+          {
+            "value": "auto",
+            "label": "t:settings.voice_search_gender_auto"
+          }
+        ],
+        "default": "female"
+      },
+      {
         "type": "range",
         "id": "product_corner_radius",
         "min": 0,

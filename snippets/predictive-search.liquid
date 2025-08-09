@@ -24,6 +24,8 @@
   data-search-position="{{ search_position }}"
   data-testid="{{ search_test_id }}"
   data-active-color-scheme="{{ settings.popover_color_scheme }}"
+  data-voice-prompt="{{ settings.voice_search_prompt | escape }}"
+  data-voice-gender="{{ settings.voice_search_gender | default: 'female' }}"
   role="search"
   aria-label="{{ 'content.search_input_label' | t }}"
 >

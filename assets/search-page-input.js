@@ -159,8 +159,73 @@ class SearchPageInputComponent extends Component {
       return;
     }
 
-    // Try to start recognition directly - browser will prompt for permissions if needed
-    this.#startRecognition();
+    // Play AI assistant voice prompt first
+    this.#playVoicePrompt();
+  }
+
+  /**
+   * Play AI assistant voice prompt
+   */
+  #playVoicePrompt() {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance();
+      
+      // Get custom prompt from theme settings or use default
+      const customPrompt = this.getAttribute('data-voice-prompt') || 
+                          "I am your AI assistant. How can I help you and what do you want to search?";
+      
+      utterance.text = customPrompt;
+      utterance.lang = document.documentElement.lang || 'en-US';
+      utterance.rate = 0.9; // Slightly slower for clarity
+      utterance.pitch = 1.0;
+      utterance.volume = 0.8;
+      
+      // Get voice gender preference
+      const voiceGender = this.getAttribute('data-voice-gender') || 'female';
+      
+      // Use a more natural voice if available
+      const voices = speechSynthesis.getVoices();
+      let preferredVoice = null;
+      
+      if (voiceGender === 'auto') {
+        // Auto: Find the best available voice
+        preferredVoice = voices.find(voice => 
+          voice.lang.includes('en') && 
+          (voice.name.includes('Google') || voice.name.includes('Natural') || voice.name.includes('Premium'))
+        );
+      } else {
+        // Gender-specific: Find voice matching the selected gender
+        preferredVoice = voices.find(voice => {
+          const isEnglish = voice.lang.includes('en');
+          const isPreferredGender = voiceGender === 'female' ? 
+            (voice.name.toLowerCase().includes('female') || voice.name.toLowerCase().includes('woman') || voice.name.toLowerCase().includes('girl')) :
+            (voice.name.toLowerCase().includes('male') || voice.name.toLowerCase().includes('man') || voice.name.toLowerCase().includes('boy'));
+          
+          return isEnglish && (isPreferredGender || voice.name.includes('Google') || voice.name.includes('Natural'));
+        });
+      }
+      
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
+      }
+      
+      utterance.onend = () => {
+        // Start speech recognition after the prompt finishes
+        setTimeout(() => {
+          this.#startRecognition();
+        }, 500); // Small delay for better UX
+      };
+      
+      utterance.onerror = () => {
+        // If voice prompt fails, start recognition anyway
+        this.#startRecognition();
+      };
+      
+      speechSynthesis.speak(utterance);
+    } else {
+      // Fallback if speech synthesis is not supported
+      this.#startRecognition();
+    }
   }
 
   /**
