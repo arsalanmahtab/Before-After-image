@@ -1,0 +1,1250 @@
+{% liquid
+  assign section_id = section.id
+  assign video_blocks = section.blocks | where: 'type', 'video'
+  assign has_videos = false
+  if video_blocks.size > 0
+    assign has_videos = true
+  endif
+  assign show_arrows = false
+  if video_blocks.size > 1
+    assign show_arrows = true
+  endif
+%}
+
+<div
+  class="spacing-style section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }}"
+  style="{% render 'spacing-padding', settings: section.settings %}{% if section.settings.section_background != blank %}; background: {{ section.settings.section_background }}{% endif %}"
+  data-autoplay="{{ section.settings.autoplay }}"
+  data-autoplay-speed="{{ section.settings.autoplay_speed }}"
+  data-video-height="{{ section.settings.video_height }}"
+>
+  <div class="video-with-text__container">
+    {% if section.settings.heading != blank %}
+      <h2 class="video-with-text__heading {{ section.settings.heading_size }} color-{{ section.settings.heading_color_scheme }}"
+          {% if section.settings.heading_gradient %}
+          style="background: {{ section.settings.heading_gradient }}; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"
+          {% endif %}
+      >
+        {{ section.settings.heading | escape }}
+      </h2>
+    {% endif %}
+
+    {% if section.settings.subheading != blank %}
+      <div class="video-with-text__subheading {{ section.settings.subheading_size }} color-{{ section.settings.subheading_color_scheme }}"
+           {% if section.settings.subheading_gradient %}
+           style="background: {{ section.settings.subheading_gradient }}; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"
+           {% endif %}
+      >
+        {{ section.settings.subheading | escape }}
+      </div>
+    {% endif %}
+
+    {% if has_videos %}
+      <div class="video-with-text__video-container">
+        <div class="video-slideshow" data-video-count="{{ video_blocks.size }}">
+          <div class="video-slideshow__container">
+            {% for block in video_blocks %}
+              <div 
+                class="video-slide {% if forloop.first %}active{% endif %}"
+                data-slide-index="{{ forloop.index0 }}"
+                data-block-id="{{ block.id }}"
+                {{ block.shopify_attributes }}
+              >
+                <div class="video-slide__content">
+                  {% if block.settings.video != blank %}
+                    <div class="video-slide__media">
+                      <!-- Volume Control (only show on active video) -->
+                      <button
+                        class="button button-unstyled video-controls__mute-button {% unless forloop.first %}hidden{% endunless %}"
+                        type="button"
+                        aria-label="{{ 'accessibility.mute_video' | t }}"
+                      >
+                        <span class="video-controls__mute-icon icon-volume">
+                          <span class="visually-hidden">{{ 'accessibility.mute_video' | t }}</span>
+                          <span class="svg-wrapper icon-volume">
+                            {{- 'icon-volume.svg' | inline_asset_content -}}
+                          </span>
+                        </span>
+                        <span class="video-controls__mute-icon icon-volume-mute hidden">
+                          <span class="visually-hidden">{{ 'accessibility.unmute_video' | t }}</span>
+                          <span class="svg-wrapper icon-volume-mute">
+                            {{- 'icon-volume-mute.svg' | inline_asset_content -}}
+                          </span>
+                        </span>
+                      </button>
+
+                      <!-- Video Player -->
+                      {% if block.settings.video.host == 'youtube' %}
+                        {{
+                          block.settings.video
+                          | external_video_url: autoplay: false, loop: true, playlist: block.settings.video.external_id, mute: '1', controls: false, enablejsapi: true
+                          | external_video_tag: data-video-type: 'youtube', class: 'video-player'
+                        }}
+                      {% elsif block.settings.video.host == 'vimeo' %}
+                        {{
+                          block.settings.video
+                          | external_video_url: autoplay: false, loop: true, muted: '1', controls: false, api: true
+                          | external_video_tag: data-video-type: 'vimeo', class: 'video-player'
+                        }}
+                      {% else %}
+                        {{ block.settings.video | video_tag: image_size: '2500x', autoplay: false, loop: true, muted: true, controls: false, class: 'video-player' }}
+                      {% endif %}
+                    </div>
+                  {% else %}
+                    <div class="video-slide__placeholder">
+                      <placeholder-image
+                        class="placeholder-video"
+                        data-block-id="{{ section_id }}-{{ block.id }}"
+                        data-type="general"
+                      ></placeholder-image>
+                      <span class="video-slide__placeholder-icon icon-play">
+                        <span class="visually-hidden">{{ 'accessibility.play_video' | t }}</span>
+                        <span class="svg-wrapper icon-play">
+                          {{- 'icon-play.svg' | inline_asset_content -}}
+                        </span>
+                      </span>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <!-- Navigation Arrows Below Video -->
+          {% if show_arrows %}
+            <div class="video-slideshow__navigation">
+              <div class="navigation-arrows">
+                <button
+                  class="slideshow-arrow slideshow-arrow--previous"
+                  type="button"
+                  aria-label="{{ 'accessibility.previous_slide' | t }}"
+                >
+                  <span class="svg-wrapper icon-arrow">
+                    {{- 'icon-arrow.svg' | inline_asset_content -}}
+                  </span>
+                </button>
+                <button
+                  class="slideshow-arrow slideshow-arrow--next"
+                  type="button"
+                  aria-label="{{ 'accessibility.next_slide' | t }}"
+                >
+                  <span class="svg-wrapper icon-arrow">
+                    {{- 'icon-arrow.svg' | inline_asset_content -}}
+                  </span>
+                </button>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Video with Text",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Video Section"
+    },
+    {
+      "type": "color_scheme",
+      "id": "heading_color_scheme",
+      "label": "Heading color scheme",
+      "info": "Custom colors for heading"
+    },
+    {
+      "type": "color_background",
+      "id": "heading_gradient",
+      "label": "Heading gradient",
+      "info": "Add gradient to heading text"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        {
+          "value": "h1",
+          "label": "Large"
+        },
+        {
+          "value": "h2",
+          "label": "Medium"
+        },
+        {
+          "value": "h3",
+          "label": "Small"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Watch our latest videos"
+    },
+    {
+      "type": "color_scheme",
+      "id": "subheading_color_scheme",
+      "label": "Subheading color scheme",
+      "info": "Custom colors for subheading"
+    },
+    {
+      "type": "color_background",
+      "id": "subheading_gradient",
+      "label": "Subheading gradient",
+      "info": "Add gradient to subheading text"
+    },
+    {
+      "type": "select",
+      "id": "subheading_size",
+      "label": "Subheading size",
+      "options": [
+        {
+          "value": "text-large",
+          "label": "Large"
+        },
+        {
+          "value": "text-medium",
+          "label": "Medium"
+        },
+        {
+          "value": "text-small",
+          "label": "Small"
+        }
+      ],
+      "default": "text-medium"
+    },
+    {
+      "type": "select",
+      "id": "video_height",
+      "label": "Video height",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay videos",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "min": 3000,
+      "max": 5000,
+      "step": 1000,
+      "unit": "ms",
+      "label": "Autoplay speed",
+      "default": 5000
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        {
+          "value": "full",
+          "label": "Full width"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        },
+        {
+          "value": "standard",
+          "label": "Standard"
+        }
+      ],
+      "default": "standard"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        {
+          "value": "background-1",
+          "label": "Background 1"
+        },
+        {
+          "value": "background-2",
+          "label": "Background 2"
+        },
+        {
+          "value": "accent-1",
+          "label": "Accent 1"
+        },
+        {
+          "value": "accent-2",
+          "label": "Accent 2"
+        }
+      ],
+      "default": "background-1"
+    },
+    {
+      "type": "color_background",
+      "id": "section_background",
+      "label": "Section background",
+      "info": "Set custom background color or gradient"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "video",
+      "name": "Video",
+      "settings": [
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Video with Text",
+      "blocks": [
+        {
+          "type": "video"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+{% stylesheet %}
+.video-with-text__container {
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 0 var(--grid-desktop-horizontal-spacing);
+}
+
+.video-with-text__heading {
+  text-align: center;
+  margin-bottom: 1rem;
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.video-with-text__subheading {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+/* Gradient text support */
+.video-with-text__heading[style*="background"],
+.video-with-text__subheading[style*="background"] {
+  display: inline-block;
+  padding: 0.2em 0;
+}
+
+.video-with-text__video-container {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.video-slideshow {
+  position: relative;
+  border-radius: 0;
+  overflow: visible;
+  box-shadow: none;
+  padding: 0 50px;
+}
+
+.video-slideshow__container {
+  position: relative;
+  width: 100%;
+  height: auto;
+  background: transparent;
+  border-radius: 0;
+  overflow: hidden;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  padding: 1rem;
+}
+
+.video-slide {
+  position: relative;
+  flex: 0 0 auto;
+  min-width: 200px;
+  max-width: calc((100% - 4rem) / 5);
+  width: calc((100% - 4rem) / 5);
+  height: 300px;
+  opacity: 0.6;
+  visibility: visible;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+  cursor: pointer;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transform: scale(0.92);
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.video-slide.active {
+  opacity: 1;
+  z-index: 2;
+  transform: scale(1.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  border-radius: 24px;
+}
+
+.video-slide:hover:not(.active) {
+  opacity: 0.85;
+  transform: scale(0.98);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.video-slide__content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  border-radius: inherit;
+  overflow: hidden;
+  margin: 0;
+  transition: border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.video-slide__media {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  border-radius: inherit;
+  overflow: hidden;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.video-player {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  display: block;
+  background: #000;
+  min-height: 100%;
+  transform: scale(1.02); /* Slight scale to prevent border gaps */
+}
+
+/* Video height variations */
+.section[data-video-height="small"] .video-slide {
+  height: 250px;
+}
+
+.section[data-video-height="medium"] .video-slide {
+  height: 300px;
+}
+
+.section[data-video-height="large"] .video-slide {
+  height: 400px;
+}
+
+/* Single video takes full width but still with border radius */
+.video-slideshow[data-video-count="1"] .video-slide {
+  opacity: 1;
+  transform: none;
+  max-width: 100%;
+  flex: none;
+}
+
+.video-slideshow[data-video-count="1"] .video-slide__content {
+  margin: 0;
+}
+
+.video-slide__placeholder {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--color-background-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+
+.video-slide__placeholder-icon {
+  width: 60px;
+  height: 60px;
+  color: var(--color-text);
+  opacity: 0.6;
+}
+
+.video-controls__mute-button {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  transform: scale(0.9);
+}
+
+.video-controls__mute-button:hover {
+  transform: scale(1);
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.video-controls__mute-icon {
+  width: 20px;
+  height: 20px;
+  color: white;
+}
+
+.video-slideshow__navigation {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 0;
+  margin-top: 1rem;
+  z-index: 10;
+}
+
+.navigation-arrows {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 8px;
+  border-radius: 24px;
+}
+
+.slideshow-arrow {
+  width: 36px;
+  height: 36px;
+  background: rgb(64, 64, 64);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+  pointer-events: auto;
+  margin: 0 8px;
+}
+
+.slideshow-arrow:hover {
+  background: rgb(80, 80, 80);
+}
+
+.slideshow-arrow svg {
+  width: 16px;
+  height: 16px;
+  fill: white;
+}
+
+.slideshow-arrow--previous svg {
+  transform: rotate(180deg);
+}
+
+@media screen and (max-width: 749px) {
+  .video-with-text__container {
+    padding: 0 var(--grid-mobile-horizontal-spacing);
+  }
+  
+  .video-slideshow__navigation {
+    padding: 0;
+    margin-top: 2rem;
+    position: relative;
+    top: auto;
+    left: auto;
+    height: auto;
+  }
+  
+  .slideshow-arrow {
+    width: 36px;
+    height: 36px;
+    position: relative;
+    z-index: 30;
+    margin: 0 10px;
+  }
+  
+  .slideshow-arrow svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .video-with-text__video-container {
+    padding: 0;
+    position: relative;
+  }
+
+  .slideshow-arrow--previous {
+    margin-left: 0.5rem;
+  }
+
+  .slideshow-arrow--next {
+    margin-right: 0.5rem;
+  }
+  
+  .video-controls__mute-button {
+    width: 32px;
+    height: 32px;
+    bottom: 0.75rem;
+    right: 0.75rem;
+    background: rgba(0, 0, 0, 0.5);
+  }
+  
+  .video-controls__mute-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .video-controls__mute-button:hover {
+    background: rgba(0, 0, 0, 0.7);
+  }
+  
+  /* Adjust video heights for mobile */
+  .section[data-video-height="small"] .video-slide {
+    height: 300px;
+  }
+  
+  .section[data-video-height="medium"] .video-slide {
+    height: 350px;
+  }
+  
+  .section[data-video-height="large"] .video-slide {
+    height: 400px;
+  }
+}
+
+@media screen and (min-width: 750px) and (max-width: 990px) {
+  .video-slideshow__container {
+    gap: 0.75rem;
+  }
+  
+  .video-slide {
+    min-width: 240px;
+    max-width: 320px;
+  }
+}
+
+/* Force videos to wrap if there are too many for one line */
+@media screen and (min-width: 1200px) {
+  .video-slideshow[data-video-count="1"] .video-slide {
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .video-slideshow[data-video-count="2"] .video-slide {
+    width: calc((100% - 1rem) / 2);
+  }
+  
+  .video-slideshow[data-video-count="3"] .video-slide {
+    width: calc((100% - 2rem) / 3);
+  }
+  
+  .video-slideshow[data-video-count="4"] .video-slide {
+    width: calc((100% - 3rem) / 4);
+  }
+  
+  .video-slideshow[data-video-count="5"] .video-slide,
+  .video-slideshow[data-video-count="6"] .video-slide,
+  .video-slideshow[data-video-count="7"] .video-slide,
+  .video-slideshow[data-video-count="8"] .video-slide {
+    width: calc((100% - 4rem) / 5);
+  }
+}
+
+@media screen and (min-width: 750px) and (max-width: 1199px) {
+  .video-slideshow[data-video-count="1"] .video-slide {
+    width: 100%;
+    max-width: 450px;
+  }
+  
+  .video-slideshow[data-video-count="2"] .video-slide {
+    width: calc((100% - 1rem) / 2);
+  }
+  
+  .video-slideshow[data-video-count="3"] .video-slide,
+  .video-slideshow[data-video-count="4"] .video-slide {
+    width: calc((100% - 2rem) / 3);
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .video-slideshow {
+    padding: 0;
+  }
+
+  .video-slideshow__container {
+    flex-direction: row;
+    gap: 0;
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+    z-index: 20;
+    display: block;
+  }
+  
+  .video-slide {
+    flex: none;
+    min-width: 100%;
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    transform: scale(1);
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+  }
+
+  .video-slide.active {
+    transform: scale(1);
+    opacity: 1;
+    visibility: visible;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .video-slide:hover:not(.active) {
+    transform: scale(1);
+  }
+
+  .video-slideshow {
+    position: relative;
+    overflow: visible;
+  }
+
+  .video-slideshow__navigation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    z-index: 30;
+    pointer-events: none;
+  }
+
+  .navigation-arrows {
+    position: relative;
+    left: 0;
+    right: 0;
+    margin-top: 0;
+    padding: 0;
+    justify-content: center;
+    gap: 30px;
+    width: 100%;
+    z-index: 30;
+    display: flex;
+  }
+
+  .video-slideshow__dots {
+    display: none;
+  }
+
+  .slideshow-arrow {
+    pointer-events: all;
+    background: rgba(0, 0, 0, 0.7);
+    width: 36px;
+    height: 36px;
+    position: relative;
+    z-index: 31;
+    cursor: pointer;
+  }
+}
+
+/* Loading state */
+.video-slide__media::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
+              linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
+              linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
+              linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  animation: loading-animation 1s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.video-slide__media:not(.loaded)::before {
+  opacity: 1;
+}
+
+@keyframes loading-animation {
+  0% {
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  }
+  100% {
+    background-position: 20px 20px, 20px 30px, 30px 10px, 10px 20px;
+  }
+}
+
+/* Smooth transitions for video opacity */
+.video-player {
+  transition: transform 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+{% endstylesheet %}
+
+{% javascript %}
+document.addEventListener('DOMContentLoaded', function() {
+  const videoSlideshows = document.querySelectorAll('.video-slideshow');
+  
+  videoSlideshows.forEach(slideshow => {
+    const slides = slideshow.querySelectorAll('.video-slide');
+    const prevButton = slideshow.querySelector('.slideshow-arrow--previous');
+    const nextButton = slideshow.querySelector('.slideshow-arrow--next');
+    const paginationDots = slideshow.querySelectorAll('.pagination-dot');
+    const muteButtons = slideshow.querySelectorAll('.video-controls__mute-button');
+    
+    let currentSlide = 0;
+    const totalSlides = slides.length;
+    let isInView = false;
+    let autoplayTimer = null;
+    
+    // Initialize slideshow
+    function initSlideshow() {
+      showSlide(currentSlide);
+      updatePagination();
+      
+      // Setup autoplay if enabled
+      if (slideshow.closest('[data-autoplay="true"]') && totalSlides > 1) {
+        startAutoplay();
+      }
+    }
+    
+    // Autoplay functionality
+    function startAutoplay() {
+      if (autoplayTimer) clearInterval(autoplayTimer);
+      const autoplaySpeed = parseInt(slideshow.closest('section')?.dataset.autoplaySpeed) || 5000;
+      
+      autoplayTimer = setInterval(() => {
+        if (isInView && totalSlides > 1) {
+          nextSlide();
+        }
+      }, autoplaySpeed);
+    }
+    
+    function stopAutoplay() {
+      if (autoplayTimer) {
+        clearInterval(autoplayTimer);
+        autoplayTimer = null;
+      }
+    }
+    
+    // Show specific slide
+    function showSlide(index) {
+      // Update active state for all slides
+      slides.forEach((slide, slideIndex) => {
+        if (slideIndex === index) {
+          slide.classList.add('active');
+        } else {
+          slide.classList.remove('active');
+        }
+      });
+      
+      currentSlide = index;
+      
+      // Update mute button visibility - only show on active video
+      muteButtons.forEach((button, buttonIndex) => {
+        if (buttonIndex === index) {
+          button.classList.remove('hidden');
+        } else {
+          button.classList.add('hidden');
+        }
+      });
+      
+      // Pause all videos first, then play only the active one
+      slides.forEach((slide, slideIndex) => {
+        const video = slide.querySelector('video, iframe');
+        if (video) {
+          if (slideIndex === index) {
+            // Play and unmute the active video
+            setTimeout(() => {
+              playVideo(video);
+              unmuteVideo(video, slideIndex);
+            }, 100);
+          } else {
+            // Pause all other videos
+            pauseVideo(video);
+          }
+        }
+      });
+    }
+    
+    // Update pagination dots
+    function updatePagination() {
+      paginationDots.forEach((dot, index) => {
+        if (index === currentSlide) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+    }
+    
+    // Navigation functions
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      showSlide(currentSlide);
+      updatePagination();
+    }
+    
+    function previousSlide() {
+      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      showSlide(currentSlide);
+      updatePagination();
+    }
+    
+    // Event listeners for navigation
+    if (nextButton) {
+      nextButton.addEventListener('click', () => {
+        stopAutoplay(); // Stop autoplay when user manually navigates
+        nextSlide();
+        if (slideshow.closest('[data-autoplay="true"]')) {
+          setTimeout(startAutoplay, 1000); // Restart autoplay after 1 second
+        }
+      });
+    }
+    
+    if (prevButton) {
+      prevButton.addEventListener('click', () => {
+        stopAutoplay();
+        previousSlide();
+        if (slideshow.closest('[data-autoplay="true"]')) {
+          setTimeout(startAutoplay, 1000);
+        }
+      });
+    }
+    
+    // Event listeners for pagination dots
+    paginationDots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        stopAutoplay();
+        showSlide(index);
+        updatePagination();
+        if (slideshow.closest('[data-autoplay="true"]')) {
+          setTimeout(startAutoplay, 1000);
+        }
+      });
+    });
+    
+    // Event listeners for video slides (click to activate)
+    slides.forEach((slide, index) => {
+      slide.addEventListener('click', (e) => {
+        // Don't trigger if clicking on mute button
+        if (!e.target.closest('.video-controls__mute-button')) {
+          stopAutoplay();
+          showSlide(index);
+          updatePagination();
+          if (slideshow.closest('[data-autoplay="true"]')) {
+            setTimeout(startAutoplay, 1000);
+          }
+        }
+      });
+    });
+    
+    // Setup mute controls
+    muteButtons.forEach((button, index) => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleMute(index);
+      });
+    });
+    
+    function toggleMute(index) {
+      const slide = slides[index];
+      const video = slide.querySelector('video, iframe');
+      const muteButton = muteButtons[index];
+      const muteIcon = muteButton.querySelector('.icon-volume');
+      const unmuteIcon = muteButton.querySelector('.icon-volume-mute');
+      
+      if (video) {
+        if (video.tagName === 'VIDEO') {
+          video.muted = !video.muted;
+          updateMuteButtonState(muteButton, video.muted);
+        } else if (video.tagName === 'IFRAME') {
+          const isMuted = !muteIcon.classList.contains('hidden');
+          if (video.src.includes('youtube')) {
+            const command = isMuted ? 'unMute' : 'mute';
+            video.contentWindow.postMessage(`{"event":"command","func":"${command}","args":""}`, '*');
+          } else if (video.src.includes('vimeo')) {
+            const volume = isMuted ? 1 : 0;
+            video.contentWindow.postMessage(`{"method":"setVolume","value":${volume}}`, '*');
+          }
+          updateMuteButtonState(muteButton, !isMuted);
+        }
+      }
+    }
+    
+    function updateMuteButtonState(muteButton, isMuted) {
+      const muteIcon = muteButton.querySelector('.icon-volume');
+      const unmuteIcon = muteButton.querySelector('.icon-volume-mute');
+      
+      if (isMuted) {
+        muteIcon.classList.add('hidden');
+        unmuteIcon.classList.remove('hidden');
+      } else {
+        muteIcon.classList.remove('hidden');
+        unmuteIcon.classList.add('hidden');
+      }
+    }
+    
+    // Helper function to check if video is playing
+    function isVideoPlaying(video) {
+      if (!video) return false;
+      
+      if (video.tagName === 'VIDEO') {
+        return !video.paused && !video.ended && video.readyState > 2;
+      } else if (video.tagName === 'IFRAME') {
+        // For iframes, we assume playing state based on our tracking
+        return video.dataset.isPlaying === 'true';
+      }
+      return false;
+    }
+    
+    // Enhanced video control functions
+    function playVideo(video) {
+      if (!video) return;
+      
+      try {
+        if (video.tagName === 'VIDEO') {
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            playPromise.then(() => {
+              video.dataset.isPlaying = 'true';
+            }).catch(error => {
+              console.log('Video autoplay failed:', error);
+              // Try to play muted if autoplay fails
+              video.muted = true;
+              video.play().then(() => {
+                video.dataset.isPlaying = 'true';
+              }).catch(e => console.log('Muted autoplay also failed:', e));
+            });
+          }
+        } else if (video.tagName === 'IFRAME') {
+          if (video.src.includes('youtube')) {
+            video.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+          } else if (video.src.includes('vimeo')) {
+            video.contentWindow.postMessage('{"method":"play"}', '*');
+          }
+          video.dataset.isPlaying = 'true';
+        }
+      } catch (error) {
+        console.log('Error playing video:', error);
+      }
+    }
+    
+    function pauseVideo(video) {
+      if (!video) return;
+      
+      try {
+        if (video.tagName === 'VIDEO') {
+          video.pause();
+          video.dataset.isPlaying = 'false';
+        } else if (video.tagName === 'IFRAME') {
+          if (video.src.includes('youtube')) {
+            video.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+          } else if (video.src.includes('vimeo')) {
+            video.contentWindow.postMessage('{"method":"pause"}', '*');
+          }
+          video.dataset.isPlaying = 'false';
+        }
+      } catch (error) {
+        console.log('Error pausing video:', error);
+      }
+    }
+    
+    // New functions for muting/unmuting without pausing
+    function muteVideo(video, index) {
+      if (!video) return;
+      
+      try {
+        if (video.tagName === 'VIDEO') {
+          video.muted = true;
+        } else if (video.tagName === 'IFRAME') {
+          if (video.src.includes('youtube')) {
+            video.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+          } else if (video.src.includes('vimeo')) {
+            video.contentWindow.postMessage('{"method":"setVolume","value":0}', '*');
+          }
+        }
+      } catch (error) {
+        console.log('Error muting video:', error);
+      }
+    }
+    
+    function unmuteVideo(video, index) {
+      if (!video) return;
+      
+      try {
+        if (video.tagName === 'VIDEO') {
+          video.muted = false;
+        } else if (video.tagName === 'IFRAME') {
+          if (video.src.includes('youtube')) {
+            video.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+          } else if (video.src.includes('vimeo')) {
+            video.contentWindow.postMessage('{"method":"setVolume","value":1}', '*');
+          }
+        }
+      } catch (error) {
+        console.log('Error unmuting video:', error);
+      }
+    }
+    
+    // Pause all videos in slideshow
+    function pauseAllVideos() {
+      slides.forEach(slide => {
+        const video = slide.querySelector('video, iframe');
+        if (video) {
+          pauseVideo(video);
+        }
+      });
+    }
+    
+    // Initialize the slideshow
+    initSlideshow();
+    
+    // Enhanced intersection observer for individual video slides
+    slides.forEach((slide, index) => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          const video = entry.target.querySelector('video, iframe');
+          const intersectionRatio = entry.intersectionRatio;
+          
+          if (intersectionRatio > 0.7) { // Video is significantly in view
+            // First pause all other videos
+            slides.forEach((otherSlide, otherIndex) => {
+              if (otherIndex !== index) {
+                const otherVideo = otherSlide.querySelector('video, iframe');
+                if (otherVideo) {
+                  pauseVideo(otherVideo);
+                }
+              }
+            });
+            
+            // Then play this specific video
+            if (video) {
+              setTimeout(() => {
+                playVideo(video);
+                // Only unmute if this is the active slide
+                if (slide.classList.contains('active')) {
+                  unmuteVideo(video, index);
+                } else {
+                  muteVideo(video, index);
+                }
+              }, 100);
+            }
+          } else if (intersectionRatio < 0.3) { // Video is mostly out of view
+            // Pause this specific video
+            if (video) {
+              pauseVideo(video);
+            }
+          }
+        });
+      }, { 
+        threshold: [0, 0.3, 0.5, 0.7, 0.9],
+        rootMargin: '0px'
+      });
+      
+      observer.observe(slide);
+    });
+    
+    // Pause videos when page becomes hidden
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        pauseAllVideos();
+        stopAutoplay();
+      }
+    });
+    
+    // Clean up on page unload
+    window.addEventListener('beforeunload', () => {
+      pauseAllVideos();
+      stopAutoplay();
+    });
+  });
+});
+{% endjavascript %}
+

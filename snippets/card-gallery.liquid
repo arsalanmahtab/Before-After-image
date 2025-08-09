@@ -34,51 +34,56 @@
   {% assign image_sizes = sizes_attribute | strip %}
 {% endif %}
 
-{% liquid
-  assign product = closest.product
+  {% liquid
+    assign product = closest.product
 
-  assign lazy_image_sizes = 'auto, ' | append: image_sizes
+    assign lazy_image_sizes = 'auto, ' | append: image_sizes
 
-  assign image_ratio_setting = block.settings.image_ratio
-  assign temp_ratio = 1
+    assign image_ratio_setting = block.settings.image_ratio
+    assign temp_ratio = 1
 
-  if image_ratio_setting == 'landscape'
-    assign temp_ratio = '16 / 9'
-  elsif image_ratio_setting == 'portrait'
-    assign temp_ratio = '4 / 5'
-  elsif image_ratio_setting == 'square'
-    assign temp_ratio = '1'
-  elsif image_ratio_setting == 'adapt'
-    if product != blank
-      assign current_featured_image_for_ratio = product.featured_image
-      if current_featured_image_for_ratio == blank and product.featured_media.preview_image != blank
-        assign current_featured_image_for_ratio = product.featured_media.preview_image
-      endif
+    if image_ratio_setting == 'landscape'
+      assign temp_ratio = '16 / 9'
+    elsif image_ratio_setting == 'portrait'
+      assign temp_ratio = '4 / 5'
+    elsif image_ratio_setting == 'square'
+      assign temp_ratio = '1'
+    elsif image_ratio_setting == 'adapt'
+      if product != blank
+        assign current_featured_image_for_ratio = product.featured_image
+        if current_featured_image_for_ratio == blank and product.featured_media.preview_image != blank
+          assign current_featured_image_for_ratio = product.featured_media.preview_image
+        endif
 
-      if current_featured_image_for_ratio != blank and current_featured_image_for_ratio.aspect_ratio != null and current_featured_image_for_ratio.aspect_ratio > 0
-        assign temp_ratio = current_featured_image_for_ratio.aspect_ratio
+        if current_featured_image_for_ratio != blank and current_featured_image_for_ratio.aspect_ratio != null and current_featured_image_for_ratio.aspect_ratio > 0
+          assign temp_ratio = current_featured_image_for_ratio.aspect_ratio
+        endif
       endif
     endif
-  endif
 
-  if temp_ratio != blank and temp_ratio != 0 and temp_ratio != ''
-    assign ratio = temp_ratio
-  else
-    assign ratio = 1
-  endif
-
-  assign variant_images = product.images | where: 'attached_to_variant?', true | map: 'src'
-  assign selected_variant_image = product.selected_or_first_available_variant.image.src
-
-  assign hover_behavior = 'carousel'
-
-  if block.settings.image_ratio == 'adapt' and block.settings.constrain_to_viewport
-    if block.settings.constrain_to_viewport != ''
-      assign constrain_to_viewport = true
-      assign media_fit = block.settings.constrain_to_viewport
+    if temp_ratio != blank and temp_ratio != 0 and temp_ratio != ''
+      assign ratio = temp_ratio
+    else
+      assign ratio = 1
     endif
-  endif
-%}
+
+    assign variant_images = product.images | where: 'attached_to_variant?', true | map: 'src'
+    assign selected_variant_image = product.selected_or_first_available_variant.image.src
+
+    # Set hover behavior based on settings
+    if block.settings.enable_hover_slideshow
+      assign hover_behavior = 'carousel'
+    else
+      assign hover_behavior = 'none'
+    endif
+
+    if block.settings.image_ratio == 'adapt' and block.settings.constrain_to_viewport
+      if block.settings.constrain_to_viewport != ''
+        assign constrain_to_viewport = true
+        assign media_fit = block.settings.constrain_to_viewport
+      endif
+    endif
+  %}
 
 <div
   ref="cardGallery"
@@ -176,12 +181,41 @@
     {% if hover_behavior == 'none' or settings.product_card_carousel == false %}
       {% assign slideshow_attributes = 'disabled="true"' %}
     {% endif %}
+    
+    {% liquid
+      assign autoplay_enabled = false
+      assign autoplay_speed = 5
+      assign hover_autoplay = false
+      if block.settings.enable_hover_slideshow
+        assign autoplay_speed = block.settings.slideshow_speed
+        assign hover_autoplay = true
+      endif
+      
+      assign show_dots = false
+      if block.settings.show_slideshow_dots and all_media.size > 1
+        assign show_dots = true
+      endif
+    %}
+    
+    {% capture slideshow_controls %}
+      {% if show_dots %}
+        {% render 'slideshow-controls', style: 'dots', item_count: all_media.size %}
+      {% endif %}
+    {% endcapture %}
+    
+    {% if hover_autoplay %}
+      {% assign slideshow_attributes = slideshow_attributes | append: ' hover-autoplay' %}
+      {% assign slideshow_attributes = slideshow_attributes | append: ' data-hover-autoplay-speed="' | append: autoplay_speed | append: '"' %}
+    {% endif %}
+    
     {% render 'slideshow',
       ref: 'slideshow',
       initial_slide: 0,
       slides: slides,
       slide_count: all_media.size,
       show_arrows: show_arrows,
+      autoplay: autoplay_enabled,
+      controls: slideshow_controls,
       attributes: slideshow_attributes
     %}
   {% elsif product != blank and product.media.size == 0 %}
@@ -356,5 +390,46 @@
   [product-grid-view='zoom-out'] .card-gallery .product-card-gallery__title-placeholder {
     padding: var(--padding-xs) !important;
     font-size: var(--font-size--xs);
+  }
+
+  /* Product card slideshow dots styling */
+  .card-gallery slideshow-controls {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+
+  .card-gallery slideshow-controls__dots {
+    display: flex;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .card-gallery slideshow-controls__dots .slideshow-control {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .card-gallery slideshow-controls__dots .slideshow-control[aria-selected="true"] {
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+
+  .card-gallery slideshow-controls__dots .slideshow-control:hover {
+    background-color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* Ensure the card gallery has relative positioning for absolute dots */
+  .card-gallery {
+    position: relative;
   }
 {% endstylesheet %}

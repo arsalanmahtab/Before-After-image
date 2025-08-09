@@ -33,7 +33,7 @@ const SLIDE_VISIBLITY_THRESHOLD = 0.7;
  */
 export class Slideshow extends Component {
   static get observedAttributes() {
-    return ['initial-slide'];
+    return ['initial-slide', 'hover-autoplay'];
   }
 
   /**
@@ -80,8 +80,14 @@ export class Slideshow extends Component {
 
     scroller.addEventListener('mousedown', this.#handleMouseDown);
 
-    this.addEventListener('mouseenter', this.suspend);
-    this.addEventListener('mouseleave', this.resume);
+    // Handle hover behavior based on hover-autoplay attribute
+    if (this.hasAttribute('hover-autoplay')) {
+      this.addEventListener('mouseenter', this.#handleHoverEnter);
+      this.addEventListener('mouseleave', this.#handleHoverLeave);
+    } else {
+      this.addEventListener('mouseenter', this.suspend);
+      this.addEventListener('mouseleave', this.resume);
+    }
     this.addEventListener('pointerenter', this.#handlePointerEnter);
     document.addEventListener('visibilitychange', this.#handleVisibilityChange);
 
@@ -89,7 +95,10 @@ export class Slideshow extends Component {
 
     this.disabled = this.isNested || this.disabled;
 
-    this.resume();
+    // Only resume autoplay if not using hover-triggered autoplay
+    if (!this.hasAttribute('hover-autoplay')) {
+      this.resume();
+    }
 
     this.current = this.initialSlideIndex;
 
@@ -131,6 +140,8 @@ export class Slideshow extends Component {
     scroller.removeEventListener('mousedown', this.#handleMouseDown);
     this.removeEventListener('mouseenter', this.suspend);
     this.removeEventListener('mouseleave', this.resume);
+    this.removeEventListener('mouseenter', this.#handleHoverEnter);
+    this.removeEventListener('mouseleave', this.#handleHoverLeave);
     this.removeEventListener('pointerenter', this.#handlePointerEnter);
     document.removeEventListener('visibilitychange', this.#handleVisibilityChange);
     this.#scroll?.destroy();
@@ -354,8 +365,27 @@ export class Slideshow extends Component {
 
     if (Number.isNaN(value)) return undefined;
 
+    // For hover-autoplay, we want to return the interval but not start automatically
     return value * 1000;
   }
+
+  /**
+   * Handles mouse enter for hover-triggered autoplay
+   */
+  #handleHoverEnter = () => {
+    const hoverSpeed = this.getAttribute('data-hover-autoplay-speed');
+    if (hoverSpeed && !this.paused) {
+      const speed = parseInt(hoverSpeed, 10) * 1000;
+      this.play(speed);
+    }
+  };
+
+  /**
+   * Handles mouse leave for hover-triggered autoplay
+   */
+  #handleHoverLeave = () => {
+    this.suspend();
+  };
 
   /**
    * The current slide index.

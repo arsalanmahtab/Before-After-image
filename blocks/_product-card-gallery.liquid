@@ -113,6 +113,35 @@
     },
     {
       "type": "header",
+      "content": "t:content.slideshow_behavior"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_hover_slideshow",
+      "label": "t:settings.enable_hover_slideshow",
+      "default": false,
+      "info": "t:info.hover_slideshow_description"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_slideshow_dots",
+      "label": "t:settings.show_slideshow_dots",
+      "default": false,
+      "info": "t:info.slideshow_dots_description"
+    },
+    {
+      "type": "range",
+      "id": "slideshow_speed",
+      "label": "t:settings.slideshow_speed",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 5,
+      "visible_if": "{{ block.settings.enable_hover_slideshow == true }}"
+    },
+    {
+      "type": "header",
       "content": "t:content.padding"
     },
     {

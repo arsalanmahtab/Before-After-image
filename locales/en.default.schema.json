@@ -155,7 +155,9 @@
     "video_alt_text": "Describe the video for assistive tech users",
     "video_autoplay": "Videos will be muted by default",
     "video_external": "Use a YouTube or Vimeo URL",
-    "pills_usage": "Used for applied filters, discount codes, and search suggestions"
+    "pills_usage": "Used for applied filters, discount codes, and search suggestions",
+    "hover_slideshow_description": "Start slideshow when hovering over product card",
+    "slideshow_dots_description": "Show navigation dots below the slideshow"
 
   },
   "names": {
@@ -608,6 +610,10 @@
     "auto_rotate_announcements": "Auto-rotate announcements",
     "auto_rotate_slides": "Auto-rotate slides",
     "autoplay": "Autoplay",
+    "autoplay_speed": "Autoplay speed",
+    "enable_hover_slideshow": "Enable hover slideshow",
+    "show_slideshow_dots": "Show slideshow dots",
+    "slideshow_speed": "Slideshow speed",
     "background": "Background",
     "background_color": "Background color",
     "background_overlay": "Background overlay",
